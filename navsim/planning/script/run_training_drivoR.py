@@ -1,0 +1,232 @@
+import logging
+import os
+import pickle
+from datetime import datetime
+from pathlib import Path
+from typing import Tuple
+
+import hydra
+import pytorch_lightning as pl
+import torch.distributed as dist
+from hydra.utils import instantiate
+from omegaconf import DictConfig
+from torch.utils.data import DataLoader
+from pytorch_lightning.loggers import WandbLogger
+
+from navsim.agents.abstract_agent import AbstractAgent
+from navsim.common.dataclasses import SceneFilter
+from navsim.common.dataloader import SceneLoader
+from navsim.planning.training.agent_lightning_module import AgentLightningModule
+from navsim.planning.training.dataset import CacheOnlyDataset, Dataset
+
+logger = logging.getLogger(__name__)
+
+CONFIG_PATH = "config/training"
+CONFIG_NAME = "default_training"
+
+
+def dist_ready():
+    return dist.is_available() and dist.is_initialized()
+
+
+def build_datasets(cfg: DictConfig, agent: AbstractAgent) -> Tuple[Dataset, Dataset]:
+    """
+    Builds training and validation datasets from omega config
+    :param cfg: omegaconf dictionary
+    :param agent: interface of agents in NAVSIM
+    :return: tuple for training and validation dataset
+    """
+
+    print("Train without caching....")
+    train_scene_filter: SceneFilter = instantiate(cfg.train_test_split.scene_filter)
+    if train_scene_filter.log_names is not None:
+        train_scene_filter.log_names = [
+            log_name
+            for log_name in train_scene_filter.log_names
+            if log_name in cfg.train_logs or log_name in cfg.val_logs
+        ]
+    else:
+        train_scene_filter.log_names = cfg.train_logs + cfg.val_logs
+
+    print("len(train_scene_filter.log_names) ", len(train_scene_filter.log_names))
+
+    val_scene_filter: SceneFilter = instantiate(cfg.train_test_split.scene_filter)
+    if val_scene_filter.log_names is not None:
+        val_scene_filter.log_names = [log_name for log_name in val_scene_filter.log_names if log_name in cfg.val_logs]
+    else:
+        val_scene_filter.log_names = cfg.val_logs
+
+    data_path = Path(cfg.navsim_log_path)
+    original_sensor_path = Path(cfg.sensor_blobs_path)
+    train_scene_loader = SceneLoader(
+        original_sensor_path=original_sensor_path,
+        data_path=data_path,
+        scene_filter=train_scene_filter,
+        sensor_config=agent.get_sensor_config(),
+    )
+
+    val_scene_loader = SceneLoader(
+        original_sensor_path=original_sensor_path,
+        data_path=data_path,
+        scene_filter=val_scene_filter,
+        sensor_config=agent.get_sensor_config(),
+    )
+
+    train_data = Dataset(
+        scene_loader=train_scene_loader,
+        feature_builders=agent.get_feature_builders(),
+        target_builders=agent.get_target_builders(),
+        cache_path=cfg.cache_path,
+        force_cache_computation=cfg.force_cache_computation,
+    )
+
+    val_data = Dataset(
+        scene_loader=val_scene_loader,
+        feature_builders=agent.get_feature_builders(),
+        target_builders=agent.get_target_builders(),
+        cache_path=cfg.cache_path,
+        force_cache_computation=cfg.force_cache_computation,
+    )
+
+    return train_data, val_data
+
+
+@hydra.main(config_path=CONFIG_PATH, config_name=CONFIG_NAME, version_base=None)
+def main(cfg: DictConfig) -> None:
+    """
+    Main entrypoint for training an agent.
+    :param cfg: omegaconf dictionary
+    """
+
+    pl.seed_everything(cfg.seed, workers=True)
+    logger.info(f"Global Seed set to {cfg.seed}")
+
+    logger.info(f"Path where all results are stored: {cfg.output_dir}")
+
+    logger.info("Building Agent")
+    agent: AbstractAgent = instantiate(cfg.agent)
+
+    logger.info("Building Lightning Module")
+    lightning_module = AgentLightningModule(
+        agent=agent,
+    )
+
+    if cfg.use_cache_without_dataset:
+        logger.info("Using cached data without building SceneLoader")
+        assert (
+            not cfg.force_cache_computation
+        ), "force_cache_computation must be False when using cached data without building SceneLoader"
+        assert (
+            cfg.cache_path is not None
+        ), "cache_path must be provided when using cached data without building SceneLoader"
+        train_data = CacheOnlyDataset(
+            cache_path=cfg.cache_path,
+            feature_builders=agent.get_feature_builders(),
+            target_builders=agent.get_target_builders(),
+            log_names=cfg.train_logs,
+        )
+        val_data = CacheOnlyDataset(
+            cache_path=cfg.cache_path,
+            feature_builders=agent.get_feature_builders(),
+            target_builders=agent.get_target_builders(),
+            log_names=cfg.val_logs,
+        )
+    else:
+        logger.info("Building SceneLoader")
+        train_data, val_data = build_datasets(cfg, agent)
+
+    logger.info("Building Datasets")
+    train_dataloader = DataLoader(train_data, **cfg.dataloader.params, shuffle=True, drop_last=True)
+    logger.info("Num training samples: %d", len(train_data))
+    val_dataloader = DataLoader(val_data, **cfg.dataloader.params, shuffle=False, drop_last=True)
+    logger.info("Num validation samples: %d", len(val_data))
+
+    logger.info("Building Trainer")
+
+    # automatically resume training
+    # find latest ckpt
+    import glob
+
+    def find_latest_checkpoint(search_pattern):
+        # List all files matching the pattern
+        list_of_files = glob.glob(search_pattern, recursive=True)
+        # Find the file with the latest modification time
+        if not list_of_files:
+            return None
+        latest_file = max(list_of_files, key=os.path.getmtime)
+        return latest_file
+
+    if cfg.train_ckpt_path is None:
+        # Pattern to match all .ckpt files in the base_path recursively
+        search_pattern = (
+            "/".join(str(cfg.output_dir).split("/")[:-1]) + "/*/lightning_logs/version_*/checkpoints/" + "*.ckpt"
+        )
+        print("/".join(str(cfg.output_dir).split("/")[:-1]))
+        print("search_pattern ", search_pattern)
+        cfg.train_ckpt_path = find_latest_checkpoint(search_pattern)
+        print("cfg.train_ckpt_path ", cfg.train_ckpt_path)
+
+    wandb_name = cfg.experiment_name
+    if "experiment_uid" in cfg:
+        wandb_name += "/" + str(cfg.experiment_uid)
+        
+    wandb_logger = WandbLogger(
+        entity="ad_research",
+        project="navsim_dense",
+        name=wandb_name,
+        log_model=True,
+    )
+
+    trainer = pl.Trainer(
+        **cfg.trainer.params, 
+        callbacks=agent.get_training_callbacks(),
+        logger=wandb_logger 
+    )
+
+    if cfg.validation_run:
+        logger.info("Starting Validation")
+        timestamp = datetime.now().strftime("%Y.%m.%d.%H.%M.%S")
+        dump_root = os.path.join(os.getenv("SUBSCORE_PATH"), "navsim1_pdm_scores", cfg.experiment_name)
+        os.makedirs(dump_root, exist_ok=True)
+        dump_path = os.path.join(dump_root, f"{timestamp}.pkl")
+        trainer.validate(
+            model=lightning_module, dataloaders=[val_dataloader], ckpt_path=cfg.train_ckpt_path, verbose=True
+        )
+        logger.info("Running predictions to collect trajectories")
+        predictions = trainer.predict(
+            AgentLightningModule(agent=agent, for_viz=True), val_dataloader, return_predictions=True
+        )
+
+        if dist_ready():
+            dist.barrier()
+
+        world_size = dist.get_world_size() if dist_ready() else 1
+        all_predictions = [None for _ in range(world_size)]
+
+        if dist_ready():
+            dist.all_gather_object(all_predictions, predictions)
+        else:
+            all_predictions = [predictions]
+
+        rank = dist.get_rank() if dist_ready() else 0
+        if rank != 0:
+            return None
+
+        merged_predictions = {}
+        for proc_prediction in all_predictions:
+            for d in proc_prediction:
+                merged_predictions.update(d)
+
+        pickle.dump(predictions, open(dump_path, "wb"))
+    else:
+        logger.info("Starting Training")
+        trainer.fit(
+            model=lightning_module,
+            train_dataloaders=train_dataloader,
+            val_dataloaders=val_dataloader,
+            ckpt_path=cfg.train_ckpt_path,
+        )
+
+
+if __name__ == "__main__":
+    main()

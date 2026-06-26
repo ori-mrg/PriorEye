@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PriorEye: Geospatial Visual Priors for End-to-End Autonomous Driving</title>
+
+  <meta name="description" content="PriorEye: Geospatial Visual Priors for End-to-End Autonomous Driving.">
+  <meta property="og:title" content="PriorEye: Geospatial Visual Priors for End-to-End Autonomous Driving"/>
+  <meta property="og:description" content="Geospatial visual priors for end-to-end autonomous driving."/>
+  <meta property="og:image" content="static/images/thumbnail.gif"/>
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+
+  <style>
+    body { font-family: 'Google Sans', 'Noto Sans', sans-serif; }
+    .hero-body { padding-top: 3rem; padding-bottom: 2rem; }
+    .publication-title { font-weight: 700; }
+    .author-block { margin-right: 0.5rem; }
+    .section { padding: 2.5rem 1.5rem; }
+    .teaser img { border-radius: 8px; }
+    .content-figure { margin: 1.5rem 0; }
+    .content-figure img { border-radius: 6px; box-shadow: 0 2px 10px rgba(0,0,0,.12); }
+    .figure-caption { color: #555; font-size: 0.95rem; margin-top: 0.6rem; }
+    pre { border-radius: 6px; }
+    .has-text-justified { text-align: justify; }
+    .button.is-dark { background-color: #363636; }
+  </style>
+</head>
+<body>
+
+<!-- Title / authors -->
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop has-text-centered">
+      <h1 class="title is-2 publication-title">
+        PriorEye: Geospatial Visual Priors for<br>End-to-End Autonomous Driving
+      </h1>
+
+      <div class="is-size-5 publication-authors">
+        <span class="author-block">Kyuhwan Yeon,</span>
+        <span class="author-block">Benjamin Ramtoula,</span>
+        <span class="author-block">Daniele De Martini</span>
+      </div>
+
+      <div class="is-size-6 publication-authors" style="margin-top:0.5rem;">
+        <span class="author-block">Mobile Robotics Group, University of Oxford</span>
+      </div>
+
+      <!-- Buttons -->
+      <div class="column has-text-centered" style="margin-top:1.5rem;">
+        <div class="buttons is-centered">
+          <!-- TODO: add arXiv / paper / video links when available -->
+          <a class="button is-dark is-rounded" href="#">
+            <span class="icon"><i class="fas fa-file-pdf"></i></span>
+            <span>Paper</span>
+          </a>
+          <a class="button is-dark is-rounded" href="https://arxiv.org/" target="_blank">
+            <span class="icon"><i class="ai ai-arxiv"></i></span>
+            <span>arXiv</span>
+          </a>
+          <a class="button is-dark is-rounded"
+             href="https://github.com/KyuhwanYeon/PriorEye" target="_blank">
+            <span class="icon"><i class="fab fa-github"></i></span>
+            <span>Code</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Teaser -->
+<section class="hero teaser">
+  <div class="container is-max-desktop has-text-centered">
+    <video autoplay loop muted playsinline width="720" style="border-radius:8px;">
+      <source src="static/images/QualitativeResult_web_crf28.mp4" type="video/mp4">
+    </video>
+    <p class="figure-caption">
+      PriorEye injects geospatial visual priors into end-to-end driving policies.
+    </p>
+  </div>
+</section>
+
+<!-- Abstract -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">Abstract</h2>
+    <div class="content has-text-justified">
+      <!-- TODO: paste the paper abstract here -->
+      <p>
+        PriorEye explores how geospatial visual priors &mdash; street-view imagery
+        encoded with SigLIP2 embeddings keyed to map locations &mdash; can be injected
+        into end-to-end autonomous driving policies. Built on the NAVSIM benchmark,
+        PriorEye augments multiple agents (Transfuser, GTRS-DP, GTRS-Dense, DrivoR) with
+        location-aware visual context, improving planning quality and robustness on the
+        navhard two-stage and navtest splits.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Qualitative results -->
+<section class="section" style="background-color:#fafafa;">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">Qualitative Results</h2>
+
+    <div class="content-figure has-text-centered">
+      <img src="static/images/qualitative1.png" alt="Qualitative result 1" width="900">
+    </div>
+    <div class="content-figure has-text-centered">
+      <img src="static/images/qualitative2.png" alt="Qualitative result 2" width="900">
+      <p class="figure-caption">
+        Planning behavior with geospatial visual priors across diverse scenes.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Robustness -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">Robustness</h2>
+
+    <div class="content-figure has-text-centered">
+      <img src="static/images/sensor_robustness.png" alt="Sensor robustness" width="900">
+      <p class="figure-caption">Robustness under degraded sensor conditions.</p>
+    </div>
+
+    <div class="columns">
+      <div class="column has-text-centered">
+        <img src="static/images/memory_corruption_baseline.png" alt="Baseline" width="420">
+        <p class="figure-caption">Baseline</p>
+      </div>
+      <div class="column has-text-centered">
+        <img src="static/images/memory_corruption_corrupted.png" alt="Corrupted" width="420">
+        <p class="figure-caption">Corrupted memory</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BibTeX -->
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3">BibTeX</h2>
+    <pre><code>@misc{prioreye,
+  title  = {PriorEye: Geospatial Visual Priors for End-to-End Autonomous Driving},
+  author = {Yeon, Kyuhwan and Ramtoula, Benjamin and De Martini, Daniele},
+  year   = {2026},
+  note   = {TODO: complete citation}
+}</code></pre>
+  </div>
+</section>
+
+<!-- Acknowledgements -->
+<section class="section" style="background-color:#fafafa;">
+  <div class="container is-max-desktop content">
+    <h2 class="title is-4">Acknowledgements</h2>
+    <p>
+      We acknowledge the open-source projects that made this work possible:
+      <a href="https://github.com/autonomousvision/navsim">NAVSIM</a>,
+      <a href="https://github.com/NVlabs/GTRS">GTRS</a>,
+      <a href="https://github.com/valeoai/DrivoR">DrivoR</a>, and
+      <a href="https://github.com/OpenDriveLab/SimScale">SimScale</a>.
+    </p>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container has-text-centered content">
+    <p>
+      Page template adapted from the
+      <a href="https://github.com/nerfies/nerfies.github.io">Nerfies</a> project page.
+      Content licensed under
+      <a href="https://www.apache.org/licenses/LICENSE-2.0">Apache-2.0</a>.
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>
