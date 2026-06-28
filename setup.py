@@ -14,7 +14,7 @@ setuptools.setup(
     author="Kyuhwan Yeon",
     author_email="kyuhwanyeon@gmail.com",
     description="PriorEye: Geospatial Visual Priors for End-to-End Autonomous Driving",
-    url="https://github.com/kyuhwanyeon/prioreye",
+    url="https://github.com/ori-mrg/PriorEye",
     python_requires=">=3.9",
     packages=setuptools.find_packages(script_folder),
     package_dir={"": "."},

@@ -70,7 +70,7 @@ $DATA_DIR
 Clone the repository and remember its host path:
 
 ```bash
-git clone https://github.com/kyuhwanyeon/PriorEye.git ~/repos/PriorEye
+git clone https://github.com/ori-mrg/PriorEye.git ~/repos/PriorEye
 export REPO_DIR=~/repos/PriorEye
 cd $REPO_DIR
 ```
