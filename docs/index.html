@@ -95,12 +95,7 @@
     <div class="content has-text-justified">
       <!-- TODO: paste the paper abstract here -->
       <p>
-        PriorEye explores how geospatial visual priors &mdash; street-view imagery
-        encoded with SigLIP2 embeddings keyed to map locations &mdash; can be injected
-        into end-to-end autonomous driving policies. Built on the NAVSIM benchmark,
-        PriorEye augments multiple agents (Transfuser, GTRS-DP, GTRS-Dense, DrivoR) with
-        location-aware visual context, improving planning quality and robustness on the
-        navhard two-stage and navtest splits.
+        Most end-to-end autonomous driving methods rely solely on instantaneous sensor observations, limiting them to reactive behavior without the anticipatory foresight human drivers employ through prior experience. We introduce geospatial visual priors, street-level visual context anchored to the intended driving route, providing visual-spatial foresight independent of real-time sensors. We propose a memory augmentation module featuring a dual-memory architecture and an adaptive memory gate, which can be easily integrated into existing end-to-end approaches. This design pairs a contextual memory for retrieved priors with a persistent fallback memory, and dynamically regulates the influence of memories based on current state compatibility. Evaluated on the NAVSIM-v2 benchmark, our approach consistently improves performance across diverse end-to-end baselines. Furthermore, because these priors are independent of onboard sensors, our method inherently improves robustness against sensor corruption, while the dual-memory design ensures safe fallback when the retrieved priors themselves become unreliable.
       </p>
     </div>
   </div>
