@@ -177,8 +177,18 @@ All content in this repository is under the [Apache-2.0 license](https://www.apa
 
 ## Citation
 
+To appear ECCV 2026.
+
 ```bibtex
-todo
+@misc{yeon2026prioreyegeospatialvisualpriors,
+      title={PriorEye: Geospatial Visual Priors for End-to-End Autonomous Driving}, 
+      author={Kyuhwan Yeon and Benjamin Ramtoula and Daniele De Martini},
+      year={2026},
+      eprint={2606.31830},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2606.31830}, 
+}
 ```
 
 ## Acknowledgements
