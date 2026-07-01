@@ -1,6 +1,16 @@
 # PriorEye: Geospatial Visual Priors for End-to-End Autonomous Driving
 
 <div align="center">
+
+<h3>🎉 Accepted to ECCV 2026 🎉</h3>
+
+[![arXiv](https://img.shields.io/badge/arXiv-2606.31830-b31b1b?logo=arxiv&logoColor=white)](https://arxiv.org/abs/2606.31830)
+[![Project Page](https://img.shields.io/badge/Project-Page-blue?logo=githubpages&logoColor=white)](https://ori-mrg.github.io/PriorEye/)
+
+
+</div>
+
+<div align="center">
   <img src="asset/thumbnail.gif" alt="thumbnail" width="600">
 </div>
 
