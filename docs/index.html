@@ -112,8 +112,30 @@
   </div>
 </section>
 
-<!-- Main results -->
+<!-- Memory Augmentation Module -->
 <section class="section" style="background-color:#fafafa;">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered">Memory Augmentation</h2>
+
+    <div class="content-figure has-text-centered">
+      <img src="static/images/memory_mechanism.png" alt="Memory Augmentation Module" width="900">
+      <p class="figure-caption" style="max-width:820px; margin-left:auto; margin-right:auto; text-align:left;">
+        The Memory Augmentation Module is our core component: a dual-memory architecture with an
+        adaptive memory gate that can be easily integrated into existing end-to-end approaches. It
+        augments the current state (S) into an enhanced state (S′) for the downstream planner. The
+        contextual memory (C) embeds street-level visual priors (V) together with their spatial
+        anchors (X) via projection and positional embedding, supplying location-specific context
+        retrieved along the route. The persistent memory (P) is a learned fallback that stays
+        reliable when the retrieved priors are corrupted. The current state queries both memories
+        through cross-attention, and the memory gate dynamically regulates the influence of the
+        retrieved priors based on current-state compatibility.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Main results -->
+<section class="section">
   <div class="container is-max-desktop">
     <h2 class="title is-3 has-text-centered">Results</h2>
     <div class="content has-text-centered" style="max-width:820px; margin:0 auto;">
@@ -137,7 +159,7 @@
 </section>
 
 <!-- Qualitative results -->
-<section class="section">
+<section class="section" style="background-color:#fafafa;">
   <div class="container is-max-desktop">
     <h2 class="title is-3 has-text-centered">Qualitative Results</h2>
 
@@ -162,7 +184,7 @@
 </section>
 
 <!-- Robustness -->
-<section class="section" style="background-color:#fafafa;">
+<section class="section">
   <div class="container is-max-desktop">
     <h2 class="title is-3 has-text-centered">Sensor Robustness</h2>
 
@@ -180,7 +202,7 @@
 </section>
 
 <!-- Geospatial visual prior corruption -->
-<section class="section">
+<section class="section" style="background-color:#fafafa;">
   <div class="container is-max-desktop">
     <h2 class="title is-3 has-text-centered">Geospatial Visual Prior Corruption</h2>
 
@@ -206,24 +228,21 @@
 </section>
 
 <!-- BibTeX -->
-<section class="section" id="BibTeX" style="background-color:#fafafa;">
+<section class="section" id="BibTeX">
   <div class="container is-max-desktop">
     <h2 class="title is-3">BibTeX</h2>
     <p class="mb-4">To appear in ECCV 2026.</p>
-    <pre><code>@misc{yeon2026prioreyegeospatialvisualpriors,
-      title={PriorEye: Geospatial Visual Priors for End-to-End Autonomous Driving}, 
-      author={Kyuhwan Yeon and Benjamin Ramtoula and Daniele De Martini},
-      year={2026},
-      eprint={2606.31830},
-      archivePrefix={arXiv},
-      primaryClass={cs.CV},
-      url={https://arxiv.org/abs/2606.31830}, 
+    <pre><code>@inproceedings{yeon2026prioreye,
+    title={PriorEye: Geospatial Visual Priors for End-to-End Autonomous Driving},
+    author={Yeon, Kyuhwan and Ramtoula, Benjamin and De Martini, Daniele},
+    year={2026},
+    booktitle={ECCV},
 }</code></pre>
   </div>
 </section>
 
 <!-- Acknowledgements -->
-<section class="section">
+<section class="section" style="background-color:#fafafa;">
   <div class="container is-max-desktop content">
     <h2 class="title is-4">Acknowledgements</h2>
     <p>
